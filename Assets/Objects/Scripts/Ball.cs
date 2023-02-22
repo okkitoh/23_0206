@@ -17,6 +17,8 @@ public class Ball : MonoBehaviour
     [SerializeField]
     int bounceParticleEmission = 20;
 
+    private AudioSource bonk;
+
 
  
     // ball is moving across x and z, transpose z as y on input/output
@@ -32,8 +34,16 @@ public class Ball : MonoBehaviour
    
     private void Awake() {
         radius = this.transform.localScale.x/2;
+        bonk = gameObject.GetComponent<AudioSource>();
+        if(bonk == null) {
+            Debug.LogError("No Audio Source found ");
+        }
         gameObject.SetActive(true);
         Reset();
+    }
+    public void PlayBonk() {
+        bonk.time = 0.14f;
+        bonk.Play();
     }
 
     public void Reset()
@@ -44,16 +54,22 @@ public class Ball : MonoBehaviour
     }
 
     public void Move(float dt) {
+        if(Input.GetKeyDown(KeyCode.Space)) {
+            this.PlayBonk();
+        }
+
         float nextX = this.transform.localPosition.x + (this.v.x * dt);
         float nextY = this.transform.localPosition.z + (this.v.y * dt);
         if(nextX < -10f || nextX > 10f) {
             nextX = Mathf.Clamp(nextX, -10f, 10f);
             this.v.x *= -1;
+            this.PlayBonk();
         }
         if(nextY < -10f || nextY > 10f)
         {
             nextY = Mathf.Clamp(nextY,-10f,10f);
             this.v.y *= -1;
+            this.PlayBonk();
         }
 
         this.transform.localPosition = new Vector3(nextX, 0, nextY);
@@ -67,6 +83,10 @@ public class Ball : MonoBehaviour
             this.v.y *= -1;
             float x_col = XCollisionCheck(p);
             if(x_col >= 0 && x_col < 1) {
+                // TODO hitting paddle makes no sound right now
+                //      change sound based on where paddle collided with ball
+                // TODO ball always maintains initial trajectory
+                //      split paddle into 3 hitzones. edge hitzones change trajectory when ball's v.x is opposite to paddle's v.x
                 this.v.x = (this.v.x / Mathf.Abs(this.v.x)) * Mathf.Max(vx_min, vx_max * x_col);
                 nextPstn.x = Mathf.Clamp(this.transform.localPosition.x + (this.v.x * dt), -10f, 10f);
             } else {
@@ -82,10 +102,6 @@ public class Ball : MonoBehaviour
         float colx = Mathf.Abs(this.position.x - p.position.x)/(this.radius + p.halfLength);
         return colx >= 0 && colx < 1f ? colx : -1;
     }
-
-
-
-
 
 
 
