@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -49,8 +50,8 @@ public class Paddle : MonoBehaviour
         if(ball.v.y < 0) {
             float displacement = bobtarget - nextPstn.x;
             if(delay_ms <= 0) { //bobtarget always leading in direction paddle should go
-                bobtarget = Random.Range(DEVIATION_MIN, DEVIATION_MAX) * (bobtarget > 0 ? -1 : 1);
-                delay_ms = Random.Range(0.150f, 0.500f); // best and worst realistic human response time
+                bobtarget = UnityEngine.Random.Range(DEVIATION_MIN, DEVIATION_MAX) * (bobtarget > 0 ? -1 : 1);
+                delay_ms = UnityEngine.Random.Range(0.150f, 0.500f); // best and worst realistic human response time
             } else if(Mathf.Abs(displacement) <= dx) {
                 delay_ms -= dt;
             }
@@ -80,6 +81,10 @@ public class Paddle : MonoBehaviour
             nextPstn.x = nextPstn.x/Mathf.Abs(nextPstn.x) * (10.5f - halfLength);
         }
         return nextPstn;
+    }
+
+    private void OnCollision(Action callback){
+        callback();
     }
 
 }

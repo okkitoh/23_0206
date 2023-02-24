@@ -57,7 +57,7 @@ public class Scoreboard : MonoBehaviour
         this.Reset();
     }
     public void Reset() {
-        _countdown = GameConstants.COUNTDOWN_START_VAL;
+        _countdown = 0;
         CountdownText.gameObject.SetActive(true);
         CountdownText.SetText("Get Ready");
         CPUScoreLabel.gameObject.SetActive(false);
