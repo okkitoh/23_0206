@@ -17,6 +17,9 @@ public class Game : MonoBehaviour
     [SerializeField]
     Scoreboard scoreboard;
 
+    [SerializeField]
+    GameObject pausePanel;
+
     private bool isPlayable = false;
     private bool isPaused = false;
 
@@ -37,13 +40,18 @@ public class Game : MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            this.isPaused = !this.isPaused;
+            this.pausePanel.SetActive(this.isPaused);
+        }
+
         float dt = Time.deltaTime;
         if(this.isPaused) {
             dt = 0;
         }
         PlayerPaddle.Move(ball, dt);
         CPUPaddle.Move(ball, dt);
-        if(isPlayable) {
+        if(isPlayable && !isPaused) {
             if(scoreboard.countdown > -1f) {
                 scoreboard.countdown -= dt;
             }
