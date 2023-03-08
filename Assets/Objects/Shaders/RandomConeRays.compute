@@ -1,0 +1,45 @@
+
+#pragma kernel RandomConeRays
+
+
+#include "UnityCG.cginc" /* UNITY_PI */
+#include "rand.cginc"
+
+/*
+Referenced from C# script using ComputeShader.FindKernel("RandomConeRays") to get handle.
+ComputeShader reference to file must be created and linked to C# script via SerializeField.
+Otherwise, it would be like trying to search a non-existent file for a keyword.
+
+random radius
+random angle
+convert from polar to cartesian coordinates.
+x = r * cos (theta)
+y = r * sin (theta)
+
+In model space, cone is defined as having a base with radius r centered at origin.
+The height h of the cone moves up along the y+ axis to form the apex per unity's preferred 
+axis orientation.
+
+Because we're using script attached to gameobject, we get nice luxury of
+handling all particle rotations at once in view space rather than model space.
+*/
+
+uniform float dt; /* Set externally with Shader.SetFloat("dt", Time.deltaTime) */
+uniform float h;
+RWStructuredBuffer<float3> Result; /* store render positions of particles */
+
+
+[numthreads(64,1,1)]
+void RandomConeRays(uint3 id : SV_DispatchThreadID) {
+    float rad = mtwist(id.x) * 3;
+    float theta = random1(id.x) * UNITY_TWO_PI;
+    float3 target = float3(rad*cos(theta), h, rad*sin(theta));
+    float3 n = normalize(target); 
+    Result[id.x] = Result[id.x] + (5 * n * dt);
+
+    //Result[id.x].x = rad * cos(theta);
+    //Result[id.x].y = 0;
+    //Result[id.x].z = rad * sin(theta);
+
+
+}
