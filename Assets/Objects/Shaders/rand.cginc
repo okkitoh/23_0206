@@ -79,8 +79,4 @@ float random(float2 n) {
     );
 }
 
-float random1(float seed) {
-    return frac(sin(seed) * 143758.5453);
-}
-
 #endif

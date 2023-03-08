@@ -1,4 +1,4 @@
-
+;
 #pragma kernel RandomConeRays
 
 
@@ -25,21 +25,20 @@ handling all particle rotations at once in view space rather than model space.
 */
 
 uniform float dt; /* Set externally with Shader.SetFloat("dt", Time.deltaTime) */
+//uniform float dx;
 uniform float h;
+//uniform float et;
 RWStructuredBuffer<float3> Result; /* store render positions of particles */
 
 
-[numthreads(64,1,1)]
+[numthreads(32,1,1)]
 void RandomConeRays(uint3 id : SV_DispatchThreadID) {
-    float rad = mtwist(id.x) * 3;
-    float theta = random1(id.x) * UNITY_TWO_PI;
-    float3 target = float3(rad*cos(theta), h, rad*sin(theta));
-    float3 n = normalize(target); 
-    Result[id.x] = Result[id.x] + (5 * n * dt);
-
-    //Result[id.x].x = rad * cos(theta);
-    //Result[id.x].y = 0;
-    //Result[id.x].z = rad * sin(theta);
-
-
+    float R = mtwist(id.x);
+    float R2 = random(float2(R, UNITY_PI));
+    float r = R * 5;
+    float theta = R2 * UNITY_TWO_PI;
+    float3 target = float3(r*cos(theta), h, r*sin(theta));
+    float3 n = normalize(target);
+    float v = (-0.4 /*lambda*/ * log(1 - R) * 30 /*v_max*/) + 10 /*v_min*/;
+    Result[id.x] = Result[id.x] + (v * n * dt);
 }

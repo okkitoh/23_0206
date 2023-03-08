@@ -16,23 +16,26 @@ public class ParticleSpark : MonoBehaviour
     uint thGroupSize;
 
     [SerializeField]
-    float travelDistance = 3;
-    [SerializeField]
     int particleCount = 1;  /* number of particles to generate */
+
+    [SerializeField]
+    float coneHeight = 0.3f;   /* tan( opp/adj ) = tan( r/h ) = max angle */
     
+    [SerializeField]
+    float radius = 2;       /* explosions to shotgun spreads */
+
+    [SerializeField]
+    float constantVelocity = 10;
 
     /* debug stuff */
     [SerializeField]
     Transform Pathtester;
 
-
-
-    void Start() {
+    void OnEnable() {
         kernel = Shader.FindKernel("RandomConeRays");
         Shader.GetKernelThreadGroupSizes(kernel, out thGroupSize, out _, out _);
         result = new ComputeBuffer(particleCount, sizeof(float) * 3);
         output = new Vector3[particleCount];
-       
 
         particles = new Transform[particleCount];
         Vector3[] initData = new Vector3[particleCount];
@@ -42,20 +45,25 @@ public class ParticleSpark : MonoBehaviour
             particles[i].transform.SetParent(this.transform);
             initData[i] = Vector3.zero;
         }
-        result.SetData(initData);
-        
+        result.SetData(initData);    
     }
 
     void Update() {
         Shader.SetBuffer(kernel, "Result", result);
         int thGroups = (int) ((particleCount + (thGroupSize - 1)) / thGroupSize);
         Shader.SetFloat("dt", Time.deltaTime);
-        Shader.SetFloat("h", travelDistance);
+        Shader.SetFloat("h", coneHeight);
         Shader.Dispatch(kernel, thGroups, 1, 1);
         result.GetData(output);
 
-        for(int i = 0; i < particleCount; ++i) { 
+        for(int i = 0; i < particleCount; ++i) {
+            particles[i].gameObject.SetActive(true);
             particles[i].transform.localPosition = output[i];
         }
+    }
+
+    void OnDestroy() {
+        result.Release();
+        result = null;
     }
 }
