@@ -25,20 +25,34 @@ handling all particle rotations at once in view space rather than model space.
 */
 
 uniform float dt; /* Set externally with Shader.SetFloat("dt", Time.deltaTime) */
-//uniform float dx;
 uniform float h;
-//uniform float et;
-RWStructuredBuffer<float3> Result; /* store render positions of particles */
+uniform float r_max;
+uniform float v_min;
+uniform float v_max;
+RWStructuredBuffer<float4> Result; /* store render positions of particles */
 
-
+// _Time < t/20, t, t*2, t*3 >
 [numthreads(32,1,1)]
 void RandomConeRays(uint3 id : SV_DispatchThreadID) {
-    float R = mtwist(id.x);
-    float R2 = random(float2(R, UNITY_PI));
-    float r = R * 5;
-    float theta = R2 * UNITY_TWO_PI;
-    float3 target = float3(r*cos(theta), h, r*sin(theta));
-    float3 n = normalize(target);
-    float v = (-0.4 /*lambda*/ * log(1 - R) * 30 /*v_max*/) + 10 /*v_min*/;
-    Result[id.x] = Result[id.x] + (v * n * dt);
+    const float friction = 0.98;
+    const float lambda = 0.6;
+    uint seed = id.x;
+    //uint seed = 1;
+    //uint seed = 5; // initial velocity 4.518
+    //uint seed = 7; // initial velocity 1.428
+    //uint seed = 9; // initial velocity 0.187;
+    
+    float R = mtwist(seed),
+          R2 = random(float2(R, UNITY_PI));
+    float r = R * r_max,
+          theta = R2 * UNITY_TWO_PI;
+    float3 dir = normalize(float3(r*cos(theta), h, r*sin(theta)));
+    float drag = exp(_Time.y * -friction);
+    float v = max( v_min, -lambda*log( 1-R )*v_max ) * drag;
+    //Result[id.x] = float3(_Time.y, v, drag);
+
+    Result[id.x].x += dir.x * v * dt; /* position gen not memoized to timestep */
+    Result[id.x].y += dir.y * v * dt; /* position gen not memoized to timestep */
+    Result[id.x].z += dir.z * v * dt; /* position gen not memoized to timestep */
+    Result[id.x].w = drag * exp(-v * _Time.y);
 }

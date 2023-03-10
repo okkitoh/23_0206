@@ -349,7 +349,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961739749}
   m_LocalRotation: {x: 0.10939675, y: 0.69859314, z: -0.10939675, w: 0.69859314}
-  m_LocalPosition: {x: -1.512, y: 0.537, z: -0}
+  m_LocalPosition: {x: -0.21, y: 0.11, z: -0.162}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -435,10 +435,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Shader: {fileID: 7200000, guid: 02b2e8db6c93d3845a08bc7493bd795c, type: 3}
-  particleCount: 100
-  coneHeight: 3
-  radius: 4
-  constantVelocity: 10
+  particleCount: 34
+  coneHeight: 0.04
+  radius: 0.97
+  minVelocity: 4.9
+  maxVelocity: 19.05
+  scale: 1.68
   Pathtester: {fileID: 424567711994748403, guid: 2647d7842957699418bf77c849f66071, type: 3}
 --- !u!4 &1478740081
 Transform:
@@ -448,7 +450,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1478740076}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.027, y: 0.041, z: -0.166}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children: []
